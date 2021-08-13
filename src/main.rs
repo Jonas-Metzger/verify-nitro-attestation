@@ -43,4 +43,6 @@ IwLz3/Y=
 	let public_key = std::str::from_utf8(public_key).unwrap();
 	println!("public key: {:#?}",public_key);
 	let _ = std::fs::write("data/public_key.txt", public_key);
+        let pcr0 = &attestation_doc.pcrs[&0];
+        let _ = std::fs::write("data/pcr0", pcr0);
 }
