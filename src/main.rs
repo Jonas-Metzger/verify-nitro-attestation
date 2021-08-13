@@ -5,8 +5,10 @@ use openssl::{x509, stack};
 
 fn main() {
 	let cose_doc = CoseSign1::from_bytes(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
-    let payload = cose_doc.get_payload(None).unwrap();
-    let attestation_doc = AttestationDoc::from_binary(&payload).unwrap();
+        let payload = cose_doc.get_payload(None).unwrap();
+        let attestation_doc = AttestationDoc::from_binary(&payload).unwrap();
+        //let param = x509::verify::X509VerifyParam(ctx);
+	//param.set_flags(x509::verify::X509VerifyFlags::NO_CHECK_TIME);
 	let cert = x509::X509::from_der(&attestation_doc.certificate).unwrap();
 	println!("checking signature...");
 	let signature_valid = cose_doc.verify_signature(&cert.public_key().unwrap()).unwrap();
@@ -35,7 +37,7 @@ IwLz3/Y=
     let _ = cabundle.push(x509::X509::from_der(c).unwrap());
 	}
 	let mut ctx = x509::X509StoreContext::new().unwrap();
-	println!("checking certificate path...");
+        println!("checking certificate path...");
 	let cert_path_valid = ctx.init(&store, &cert, &cabundle, |x| x.verify_cert()).unwrap();
 	assert!(cert_path_valid);
 	println!("certificate path valid.");
@@ -44,5 +46,7 @@ IwLz3/Y=
 	println!("public key: {:#?}",public_key);
 	let _ = std::fs::write("data/public_key.txt", public_key);
         let pcr0 = &attestation_doc.pcrs[&0];
-        let _ = std::fs::write("data/pcr0", pcr0);
+        let pcr0 = hex::encode(pcr0);
+	println!("PCR0: {:#?}", pcr0);
+        let _ = std::fs::write("data/pcr0.txt", pcr0);
 }
