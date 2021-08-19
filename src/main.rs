@@ -2,12 +2,28 @@ use aws_nitro_enclaves_cose as cose;
 use nsm_io::AttestationDoc;
 use cose::CoseSign1;
 use openssl::{x509, stack};
+use x509_parser::certificate::X509CertificateParser;
+use x509_parser::nom::Parser;
+use x509_parser as x509p;
+use coset::{iana, CborSerializable};
+use ring::signature;
 
 fn main() {
 	let cose_doc = CoseSign1::from_bytes(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
+	let cose_doc2 = coset::CoseSign1::from_slice(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
+	let payload2 = cose_doc2.payload.as_ref().unwrap();
+	let attestation_doc2 = AttestationDoc::from_binary(&payload2).unwrap();
+	//println!("{:#?}",attestation_doc2);
         let payload = cose_doc.get_payload(None).unwrap();
         let attestation_doc = AttestationDoc::from_binary(&payload).unwrap();
+	let mut config = rustls::ClientConfig::new();
 	let cert = x509::X509::from_der(&attestation_doc.certificate).unwrap();
+	let (_, cert2) = X509CertificateParser::new().parse(&attestation_doc2.certificate).unwrap();
+	println!("{:#?}", cert2.public_key().subject_public_key.data);
+	let verification_alg: &dyn signature::VerificationAlgorithm = &signature::ECDSA_P384_SHA384_ASN1;
+	let key = signature::UnparsedPublicKey::new(verification_alg, cert2.public_key().subject_public_key.data);
+	println!("{:#?}", cert2.signature_algorithm.algorithm);
+	println!("{:#?}", cose_doc2.verify_signature(b"Signature1", |sig, data| key.verify(data, sig))); 
 	println!("checking signature...");
 	let signature_valid = cose_doc.verify_signature(&cert.public_key().unwrap()).unwrap();
 	assert!(signature_valid);
@@ -27,6 +43,10 @@ MQCjfy+Rocm9Xue4YnwWmNJVA44fA0P5W2OpYow9OYCVRaEevL8uO1XYru5xtMPW
 rfMCMQCi85sWBbJwKKXdS6BptQFuZbT73o/gBh1qUxl/nNr12UO8Yfwr6wPLb+6N
 IwLz3/Y=
 -----END CERTIFICATE-----";
+	let cert2 = X509CertificateParser::new().parse(&attestation_doc.certificate);
+	//println!("{:#?}", cert2);
+	let mut root_cert_store = rustls::RootCertStore::empty();
+	let _ = root_cert_store.add_pem_file(&mut root_cert.as_bytes());
 	let root_cert = x509::X509::from_pem(root_cert.as_bytes()).unwrap();
 	let _ = builder.add_cert(root_cert);
 	let _ = builder.set_flags(x509::verify::X509VerifyFlags::NO_CHECK_TIME);

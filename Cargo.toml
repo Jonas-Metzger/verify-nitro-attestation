@@ -10,6 +10,10 @@ edition = "2018"
 aws-nitro-enclaves-cose = "0.3.0"
 openssl = { version = "0.10.35", features = ["vendored"] }
 hex = "0.4.3"
+rustls = "*"
+x509-parser = { version = "*", features = ["verify", "validate"] }
+coset = "*"
+ring = "*"
 
 [dependencies.nsm-io]
 git = "https://github.com/aws/aws-nitro-enclaves-nsm-api.git"
