@@ -2,12 +2,13 @@ use aws_nitro_enclaves_cose as cose;
 use nsm_io::AttestationDoc;
 use cose::CoseSign1;
 use openssl::{x509, stack};
+//use x509_parser::prelude::*;
 
 fn main() {
 	let cose_doc = CoseSign1::from_bytes(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
         let payload = cose_doc.get_payload(None).unwrap();
         let attestation_doc = AttestationDoc::from_binary(&payload).unwrap();
-	let cert = x509::X509::from_der(&attestation_doc.certificate).unwrap();
+        let cert = x509::X509::from_der(&attestation_doc.certificate).unwrap();
 	println!("checking signature...");
 	let signature_valid = cose_doc.verify_signature(&cert.public_key().unwrap()).unwrap();
 	assert!(signature_valid);

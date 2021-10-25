@@ -1,22 +1,7 @@
-#!/bin/bash
-
-# This should take the name of the Rust project name
-rust_project_name=verify_attestation
-
-# Make sure a recent version of Emscripten (e.g. 1.39.8) is activated and available before running this
-
-# Transpile to WASM - only release builds work for this particular target
-cargo build --release --target=wasm32-unknown-emscripten
-
-cd target/wasm32-unknown-emscripten/release
-
-# Transform to WAT
-npx wasm2wat "$rust_project_name.wasm" -o "$rust_project_name.wat"
-
-# The WASI functions are exported from `env` in the filesystem from `emscripten-module-wrapper`
-sed -i 's/wasi_snapshot_preview1/env/g' "$rust_project_name.wat"
-sed -i 's/wasi_unstable/env/g' "$rust_project_name.wat"
-sed -i 's/wasi/env/g' "$rust_project_name.wat"
-
-# Transform back to WASM
-npx wat2wasm "$rust_project_name.wat" -o "$rust_project_name.wasm"
+# wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_VERSION}/wasi-sdk-12.0-linux.tar.gz
+# tar xvf wasi-sdk-12.0-linux.tar.gz
+# export WASI_SDK_PATH=`pwd`/wasi-sdk-12.0
+export WASI_SDK_PATH=/home/metzgerj/github/wasi-sdk/wasi-sdk-12.0
+export CFLAGS="--sysroot=${WASI_SDK_PATH}/share/wasi-sysroot -D_WASI_EMULATED_SIGNAL -OPENSSL_NO_SOCK -DOPENSSL_STATIC"
+export CFLAGS="${CFLAGS} -DNO_SYSLOG -DOPENSSL_NO_UI -DOPENSSL_NO_UI_CONSOLE -DOPENSSL_NO_DGRAM -D_WASI_EMULATED_MMAN"
+env "CFLAGS_wasm32-wasi=${CFLAGS}" cargo build --target=wasm32-wasi
