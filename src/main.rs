@@ -1,19 +1,28 @@
 use aws_nitro_enclaves_cose as cose;
 use nsm_io::AttestationDoc;
 use cose::CoseSign1;
-use openssl::{x509, stack};
+use openssl::x509::store::X509StoreBuilder;
+use openssl::x509::{X509, X509StoreContext};
+use openssl::stack::Stack;
+use openssl::x509::verify::X509VerifyFlags;
+//use std::ffi::X509_STORE_free;
 //use x509_parser::prelude::*;
+use std::ffi;
+//use foreign_types::ForeignTypeRef;
+//use std::mem;
+
+
 
 fn main() {
 	let cose_doc = CoseSign1::from_bytes(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
         let payload = cose_doc.get_payload(None).unwrap();
         let attestation_doc = AttestationDoc::from_binary(&payload).unwrap();
-        let cert = x509::X509::from_der(&attestation_doc.certificate).unwrap();
+        let cert = X509::from_der(&attestation_doc.certificate).unwrap();
 	println!("checking signature...");
 	let signature_valid = cose_doc.verify_signature(&cert.public_key().unwrap()).unwrap();
 	assert!(signature_valid);
 	println!("signature valid.");
-	let mut builder = x509::store::X509StoreBuilder::new().unwrap();
+	let mut builder = X509StoreBuilder::new().unwrap();
 	let root_cert = "-----BEGIN CERTIFICATE-----
 MIICETCCAZagAwIBAgIRAPkxdWgbkK/hHUbMtOTn+FYwCgYIKoZIzj0EAwMwSTEL
 MAkGA1UEBhMCVVMxDzANBgNVBAoMBkFtYXpvbjEMMAoGA1UECwwDQVdTMRswGQYD
@@ -28,15 +37,15 @@ MQCjfy+Rocm9Xue4YnwWmNJVA44fA0P5W2OpYow9OYCVRaEevL8uO1XYru5xtMPW
 rfMCMQCi85sWBbJwKKXdS6BptQFuZbT73o/gBh1qUxl/nNr12UO8Yfwr6wPLb+6N
 IwLz3/Y=
 -----END CERTIFICATE-----";
-	let root_cert = x509::X509::from_pem(root_cert.as_bytes()).unwrap();
+	let root_cert = X509::from_pem(root_cert.as_bytes()).unwrap();
 	let _ = builder.add_cert(root_cert);
-	let _ = builder.set_flags(x509::verify::X509VerifyFlags::NO_CHECK_TIME);
+	let _ = builder.set_flags(X509VerifyFlags::NO_CHECK_TIME);
 	let store = builder.build();
-	let mut cabundle = stack::Stack::new().unwrap();
+	let mut cabundle = Stack::new().unwrap();
 	for c in attestation_doc.cabundle[1..].iter() {
-    let _ = cabundle.push(x509::X509::from_der(c).unwrap());
+    let _ = cabundle.push(X509::from_der(c).unwrap());
 	}
-	let mut ctx = x509::X509StoreContext::new().unwrap();
+	let mut ctx = X509StoreContext::new().unwrap();
         println!("checking certificate path...");
 	let cert_path_valid = ctx.init(&store, &cert, &cabundle, |x| x.verify_cert()).unwrap();
 	assert!(cert_path_valid);
