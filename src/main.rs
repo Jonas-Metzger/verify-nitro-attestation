@@ -7,7 +7,7 @@ use openssl::stack::Stack;
 use openssl::x509::verify::X509VerifyFlags;
 //use std::ffi::X509_STORE_free;
 //use x509_parser::prelude::*;
-use std::ffi;
+//use std::ffi;
 //use foreign_types::ForeignTypeRef;
 //use std::mem;
 
