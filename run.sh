@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# wasi-sdk-12.0-linux.tar.gz
+# wasmer target/wasm32-wasi/debug/verify_attestation.wasm data/attestation_doc
+
 rust_project_name=verify_attestation
 input_file="data/attestation_doc"
 output_file="data/extracted.txt"
