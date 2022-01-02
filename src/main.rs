@@ -5,13 +5,6 @@ use openssl::x509::store::X509StoreBuilder;
 use openssl::x509::{X509, X509StoreContext};
 use openssl::stack::Stack;
 use openssl::x509::verify::X509VerifyFlags;
-//use std::ffi::X509_STORE_free;
-//use x509_parser::prelude::*;
-//use std::ffi;
-//use foreign_types::ForeignTypeRef;
-//use std::mem;
-
-
 
 fn main() {
 	let cose_doc = CoseSign1::from_bytes(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
@@ -38,8 +31,6 @@ rfMCMQCi85sWBbJwKKXdS6BptQFuZbT73o/gBh1qUxl/nNr12UO8Yfwr6wPLb+6N
 IwLz3/Y=
 -----END CERTIFICATE-----";
 	let root_cert = X509::from_pem(root_cert.as_bytes()).unwrap();
-	//let root_cert = &std::fs::read("data/root.crt").unwrap();
-	//let root_cert = X509::from_pem(root_cert).unwrap();
 	let _ = builder.add_cert(root_cert);
 	let _ = builder.set_flags(X509VerifyFlags::NO_CHECK_TIME);
 	let store = builder.build();
