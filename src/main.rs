@@ -38,16 +38,19 @@ rfMCMQCi85sWBbJwKKXdS6BptQFuZbT73o/gBh1qUxl/nNr12UO8Yfwr6wPLb+6N
 IwLz3/Y=
 -----END CERTIFICATE-----";
 	let root_cert = X509::from_pem(root_cert.as_bytes()).unwrap();
+	//let root_cert = &std::fs::read("data/root.crt").unwrap();
+	//let root_cert = X509::from_pem(root_cert).unwrap();
 	let _ = builder.add_cert(root_cert);
 	let _ = builder.set_flags(X509VerifyFlags::NO_CHECK_TIME);
 	let store = builder.build();
 	let mut cabundle = Stack::new().unwrap();
 	for c in attestation_doc.cabundle[1..].iter() {
-    let _ = cabundle.push(X509::from_der(c).unwrap());
+		let _ = cabundle.push(X509::from_der(c).unwrap());
 	}
 	let mut ctx = X509StoreContext::new().unwrap();
         println!("checking certificate path...");
 	let cert_path_valid = ctx.init(&store, &cert, &cabundle, |x| x.verify_cert()).unwrap();
+        println!("valid: {:#?}",cert_path_valid);
 	assert!(cert_path_valid);
 	println!("certificate path valid (ignoring time).");
 	let public_key = &attestation_doc.public_key.unwrap();

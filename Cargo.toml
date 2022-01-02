@@ -8,10 +8,12 @@ edition = "2018"
 
 [dependencies]
 aws-nitro-enclaves-cose = "0.3.0"
-openssl = { version = "0.10.36", features=["vendored"]}
+openssl = { version = "0.10", features=["vendored"]}
 hex = "0.4.3"
 
 [dependencies.nsm-io]
 git = "https://github.com/aws/aws-nitro-enclaves-nsm-api.git"
 rev = "4f468c4"
 
+[patch.crates-io]
+openssl-src = { git = 'https://github.com/mdrokz/openssl-src-rs' }
