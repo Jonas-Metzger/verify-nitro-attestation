@@ -41,7 +41,6 @@ IwLz3/Y=
 	let mut ctx = X509StoreContext::new().unwrap();
         println!("checking certificate path...");
 	let cert_path_valid = ctx.init(&store, &cert, &cabundle, |x| x.verify_cert()).unwrap();
-        println!("valid: {:#?}",cert_path_valid);
 	assert!(cert_path_valid);
 	println!("certificate path valid (ignoring time).");
 	let public_key = &attestation_doc.public_key.unwrap();
@@ -50,6 +49,6 @@ IwLz3/Y=
         let pcr0 = &attestation_doc.pcrs[&0];
         let pcr0 = hex::encode(pcr0);
 	println!("PCR0: {:#?}", pcr0);
-        let extracted = format!("{}|{}", public_key, pcr0);
-        let _ = std::fs::write("data/extracted.txt", extracted);
+	let _ = std::fs::write("data/public_key", public_key);
+	let _ = std::fs::write("data/image_hash", pcr0);
 }
