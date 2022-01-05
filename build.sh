@@ -1,4 +1,4 @@
 export CFLAGS="${CFLAGS} -D_WASI_EMULATED_SIGNAL -DOPENSSL_NO_SOCK -DOPENSSL_STATIC -DOPENSSL_NO_AFALGENG  -DOPENSSL_SYS_NETWARE"
 export CFLAGS="${CFLAGS} -DNO_SYSLOG -DOPENSSL_NO_UI_CONSOLE -DOPENSSL_NO_DGRAM -D_WASI_EMULATED_MMAN -DOPENSSL_NO_SECURE_MEMORY"
 CC=wasicc CFLAGS=$CFLAGS cargo build --release --target=wasm32-wasi
-# cp target/wasm32-wasi/release/verify_attestation.wasm .
+cp target/wasm32-wasi/release/verify_attestation.wasm run
