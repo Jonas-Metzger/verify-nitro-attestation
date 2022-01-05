@@ -7,7 +7,7 @@ use openssl::stack::Stack;
 use openssl::x509::verify::X509VerifyFlags;
 
 fn main() {
-	let cose_doc = CoseSign1::from_bytes(&std::fs::read("data/attestation_doc").unwrap()).unwrap();
+	let cose_doc = CoseSign1::from_bytes(&std::fs::read("attestation_doc").unwrap()).unwrap();
         let payload = cose_doc.get_payload(None).unwrap();
         let attestation_doc = AttestationDoc::from_binary(&payload).unwrap();
         let cert = X509::from_der(&attestation_doc.certificate).unwrap();
@@ -49,6 +49,6 @@ IwLz3/Y=
         let pcr0 = &attestation_doc.pcrs[&0];
         let pcr0 = hex::encode(pcr0);
 	println!("PCR0: {:#?}", pcr0);
-	let _ = std::fs::write("data/public_key", public_key);
-	let _ = std::fs::write("data/image_hash", pcr0);
+	let _ = std::fs::write("public_key", public_key);
+	let _ = std::fs::write("image_hash", pcr0);
 }
