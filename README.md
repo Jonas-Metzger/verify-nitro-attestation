@@ -1,5 +1,9 @@
 # verify-nitro-attestation
+To build:
+1) install wasienv, rustup and run `rustup target add wasm32-wasi`
+2) run `sh build.sh`
 
-1) put the attestation doc into `data/attestation_doc` in binary format. 
-2) `cargo run`
-3) if verification suceeds, public key is extracted into `data/public_key.txt` and hash of the `.eif` is put into `data/pcr0.txt`
+To run:
+1) Put the binary `attestation_doc` file into the same folder as `verify_attestaion.wasm`
+2) Run `sh run.sh`
+3) if the verification suceeds,  `public_key` and `image_hash` are extracted from the attestation doc and put into the same folder.
