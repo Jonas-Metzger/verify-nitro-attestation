@@ -15,5 +15,3 @@ hex = "0.4.3"
 git = "https://github.com/aws/aws-nitro-enclaves-nsm-api.git"
 rev = "4f468c4"
 
-[patch.crates-io]
-openssl-src = { git = 'https://github.com/mdrokz/openssl-src-rs' }

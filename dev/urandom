@@ -1,0 +1,4 @@
+We don't actually need a source of randomness for cryptographic security, since we're just checking signatures.
+However, openssl still tries to query /dev/urandom.
+This seems to be because openssl always wants to randomize it's runtime duration, in an effort to prevent side-channel attacks, 
+at least according to https://stackoverflow.com/questions/61235285/why-does-ecc-signature-verification-need-random-numbers-sometimes-taking-a-long
